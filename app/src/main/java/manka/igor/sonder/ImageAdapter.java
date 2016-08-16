@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import manka.igor.sonder.utils.MLRoundedImageView;
+
 /**
  * Created by Igor on 10.08.2016.
  */
@@ -41,14 +43,14 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
+        MLRoundedImageView imageView;
         if (convertView == null) {
-            imageView = new ImageView(context);
+            imageView = new MLRoundedImageView(context);
             imageView.setLayoutParams(new GridView.LayoutParams(200, 200));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
         } else {
-            imageView = (ImageView) convertView;
+            imageView = (MLRoundedImageView) convertView;
         }
         imageView.setImageResource(mThumbIds[position]);
         return imageView;

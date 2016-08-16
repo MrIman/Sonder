@@ -1,5 +1,6 @@
 package manka.igor.sonder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -32,36 +33,48 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Intent a = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(a);
+//        Intent a = new Intent(LoginActivity.this, MainActivity.class); //oDPALENIE BEZ LOGOWANIA
+//        startActivity(a);
         Button loginButton = (Button)findViewById(R.id.loginButton);
         final EditText loginET = (EditText)findViewById(R.id.loginEditText);
         final EditText passwordET = (EditText)findViewById(R.id.passwordEditText);
+        final TextView textView = (TextView)findViewById(R.id.failMessage) ;
         loginButton.setOnClickListener(new View.OnClickListener() {
             boolean czyPoprawne = true;
             @Override
             public void onClick(View v) {
-                Handler handler = new Handler();
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
 
-                    }
-                };
                 LoginAttempt loginAttempt = new LoginAttempt(loginET.getText().toString(), passwordET.getText().toString());
-                authenticationRepository.login(loginAttempt).enqueue(new RetrofitCallbackAdapter<ExpiringAccessToken>() {
-                    @Override
-                    public void onResponse(Call<ExpiringAccessToken> call, Response<ExpiringAccessToken> response) {
-                        ExpiringAccessToken token = response.body();
-                        token.getAccessToken();
-                        token.getExpires();
-                        
-                        runIntentSync(new Intent(LoginActivity.this, MainActivity.class));
-                        
-                    }
 
-                   
-                });
+                    authenticationRepository.login(loginAttempt).enqueue(new RetrofitCallbackAdapter<ExpiringAccessToken>() {
+
+                        @Override
+                        public void onResponse(Call<ExpiringAccessToken> call, Response<ExpiringAccessToken> response) {
+                            textView.setText("");
+                            try {
+                                ExpiringAccessToken token = response.body();
+                                token.getAccessToken();
+                                token.getExpires();
+
+                                runIntentSync(new Intent(LoginActivity.this, MainActivity.class));
+                            }
+                            catch(Exception ex){
+                                textView.setText("Błędny login lub hasło");
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<ExpiringAccessToken> call, Throwable t) {
+
+                            textView.setText("Błąd sieci");
+
+                        }
+
+
+                    });
+
+
             }
         });
     }
